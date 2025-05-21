@@ -37,17 +37,43 @@ export default {
     EditPerson,
     ListPersons,
     ViewPerson
-  }
+  },
+    data() {
+        return {
+            personList: [
+                {
+                    name: "Hassan",
+                    yob: 1995,
+                    age: new Date().getFullYear() - 1995,
+                    weight: 68,
+                    height: 175,
+                    bmi: (68 / ((175 / 100) ** 2)).toFixed(2),
+                    category: 't.b.c',
+                    photoUrl: "https://randomuser.me/api/portraits/men/44.jpg"
+                },
+                {
+                    name: "Siti",
+                    yob: 2000,
+                    age: new Date().getFullYear() - 2000,
+                    weight: 52,
+                    height: 160,
+                    bmi: (52 / ((160 / 100) ** 2)).toFixed(2),
+                    category: 'normal',
+                    photoUrl: "https://randomuser.me/api/portraits/women/3.jpg"
+                }
+            ],
+        }
+    },
+    methods: {
+        handleAddPerson(entry)
+        {
+            this.personList.push(entry)
+        }
+    },
 }
+
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+
 </style>
