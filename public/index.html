@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<head>
+    <meta charset="UTF-8">
+    <title>Person BMI Web App</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f4f7f9;
+            padding: 20px;
+        }
+        .container {
+            max-width: 700px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+        h2,
+        h3 {
+            border-bottom: 2px solid #42b983;
+            padding-bottom: 10px;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        input {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #42b983;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        ul {
+            padding: 0;
+            list-style: none;
+        }
+        li {
+            background: #f0f9f5;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 5px solid #42b983;
+            border-radius: 5px;
+        }
+        .bar-container {
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            margin: 4px 0 15px 0;
+        }
+        .bar {
+            height: 20px;
+            color: white;
+            text-align: center;
+        line-height: 20px;
+            border-radius: 5px;
+        }
+        .bar.underweight {
+            background-color: #2196f3;
+        }
+        .bar.normal {
+            background-color: #4caf50;
+        }
+        .bar.overweight {
+            background-color: #ff9800;
+        }
+        .bar.obese {
+            background-color: #f44336;
+        }
+        .main-nav {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        nav a {
+            margin: 0 10px;
+            text-decoration: none;
+            color: #42b983;
+            font-weight: bold;
+            padding: 6px 12px;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+        nav a:hover {
+            background-color: #42b983;
+            color: white;
+        }
+        .person-card {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .person-photo {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .detail-box {
+            margin-top: 10px;
+            padding: 15px;
+            background: #f0f9f5;
+            border-radius: 8px;
+        }
+        .edit-form-section {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            display: none;
+        }
+        .feedback {
+            margin-top: 10px;
+            color: #d32f2f;
+            font-style: italic;
+        }
+        .chart-canvas {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Person BMI Web App</h1>
+    <nav class="main-nav">
+            <a href="#">Add Person</a> |
+            <a href="#">View All</a> |
+            <a href="#">View One</a> |
+            <a href="#">Edit</a> |
+            <a href="#">Delete</a>
+        </nav>
+        <h3>Add Person</h3>
+        <form id="bmiForm">
+            Fullname : <input type="text" id="name" placeholder="Name" required />
+            Year Born : <input type="text" id="yob" placeholder="yyyy" required />
+            Weight : <input type="number" id="weight" placeholder="Weight (kg)" required />
+            Height : <input type="number" id="height" placeholder="Height (cm)" required />
+            Photo URL : <input type="text" id="photoUrl" placeholder="Image URL" />
+            <button type="submit">Add Person</button>
+        </form>
+        <h3>Person List</h3>
+        <ul id="personList"></ul>
+        <h3>View One Person</h3>
+        <input type="number" id="indexInput" placeholder="Enter index" />
+        <div id="onePersonView" class="detail-box">
+            <em>No person at that index</em>
+        </div>
+        <h3>Edit Person</h3>
+        <input type="number" id="editIndexInput" placeholder="Enter index to edit" />
+        <div id="editFeedback" class="feedback"><em>Enter an index to load person data</em></div>
+        <div id="editFormSection" class="edit-form-section">
+            <input type="text" id="editName" placeholder="Name" />
+            <input type="number" id="editWeight" placeholder="Weight (kg)" />
+            <input type="number" id="editHeight" placeholder="Height (cm)" />
+            <input type="text" id="editPhotoUrl" placeholder="Image URL" />
+            <button onclick="editPerson()">Update</button>
+        </div>
+        <h3>Delete Person by Index</h3>
+        <input type="number" id="deleteIndex" placeholder="Enter index to delete" />
+        <div id="deleteFeedback" class="feedback"><em>Enter index to delete</em></div>
+        <h3>Statistics / Analysis</h3>
+        <div id="bmiStats"></div>
+        <canvas id="bmiChart" width="400" height="300" class="chart-canvas"></canvas>
+    </div>
+    <script>
+        
+        window.addEventListener('DOMContentLoaded', () => {
+            displayList();
+            showTextStats();
+            showChartStats();
+        });
+        //var personList = [];
+        var personList = [
+            {
+                name: "Hassan",
+                yob: 1995,
+                age: new Date().getFullYear() - 1995,
+                weight: 68,
+                height: 175,
+                bmi: (68 / ((175 / 100) ** 2)).toFixed(2),
+                category: 't.b.c',
+                photoUrl: "https://randomuser.me/api/portraits/men/44.jpg"
+            },
+            {
+                name: "Siti",
+                yob: 2000,
+                age: new Date().getFullYear() - 2000,
+                weight: 52,
+                height: 160,
+                bmi: (52 / ((160 / 100) ** 2)).toFixed(2),
+                category: 'normal',
+                photoUrl: "https://randomuser.me/api/portraits/women/3.jpg"
+            }
+        ];
+   document.getElementById('bmiForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+            const name = document.getElementById('name').value;
+            const yob = parseInt(document.getElementById('yob').value);
+            const weight = parseFloat(document.getElementById('weight').value);
+            const height = parseFloat(document.getElementById('height').value);
+            const photoUrl = document.getElementById('photoUrl').value.trim();
+            const age = new Date().getFullYear() - yob;
+            const bmi = (weight / ((height / 100) ** 2)).toFixed(2);
+            const person = {
+                "name": name,
+                "yob": yob,
+                "age": age,
+                "weight": weight,
+                "height": height,
+                "bmi": bmi,
+                "photoUrl": photoUrl
+            };
+            personList.push(person);
+            displayList();
+            displayStats();
+            // document.getElementById('bmiForm').reset();
+        });
+        function displayList() {
+            const ul = document.getElementById('personList');
+            ul.innerHTML = '';
+            personList.forEach((p, i) => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+          <div class="person-card">
+            ${p.photoUrl ? `<img src="${p.photoUrl}" alt="photo" class="person-photo">` : ''}
+            <div>
+              <strong>[${i}] ${p.name}</strong> (Age: ${p.age})<br>
+              Weight: ${p.weight} kg, Height: ${p.height} cm<br>
+              BMI: ${p.bmi}
+            </div>
+          </div>
+        `;
+                ul.appendChild(li);
+            });
+        }
+        function showTextStats() {
+            const statsDiv = document.getElementById('bmiStats');
+            if (personList.length === 0) {
+                statsDiv.innerHTML = '<p>No data yet.</p>';
+                return;
+            }
+            const categories = { underweight: 0, normal: 0, overweight: 0, obese: 0 };
+            personList.forEach(p => {
+                const bmi = parseFloat(p.bmi);
+                if (bmi < 18.5) categories.underweight++;
+                else if (bmi < 24.9) categories.normal++;
+                else if (bmi < 29.9) categories.overweight++;
+                else categories.obese++;
+            });
+            const total = personList.length;
+            let html = '';
+            for (const cat in categories) {
+                const count = categories[cat];
+                const percent = ((count / total) * 100).toFixed(1);
+                html += `
+          <div><strong>${cat.charAt(0).toUpperCase() + cat.slice(1)}</strong>: ${count} (${percent}%)</div>
+          <div class="bar-container">
+            <div class="bar ${cat}" style="width:${percent}%">${percent}%</div>
+          </div>
+        `;
+            }
+            statsDiv.innerHTML = html;
+        }
+  let bmiChart;
+        function showChartStats() {
+            const categories = { Underweight: 0, Normal: 0, Overweight: 0, Obese: 0 };
+            personList.forEach(p => {
+                const bmi = parseFloat(p.bmi);
+                if (bmi < 18.5) categories.Underweight++;
+                else if (bmi < 24.9) categories.Normal++;
+                else if (bmi < 29.9) categories.Overweight++;
+                else categories.Obese++;
+            });
+            const ctx = document.getElementById('bmiChart').getContext('2d');
+            const data = {
+                labels: Object.keys(categories),
+                datasets: [{
+                    data: Object.values(categories),
+                    backgroundColor: ['#2196f3', '#4caf50', '#ff9800', '#f44336']
+                }]
+            };
+            if (bmiChart) bmiChart.destroy();
+            bmiChart = new Chart(ctx, { type: 'pie', data, options: { responsive: true, plugins: { legend: { position: 'bottom' } } } });
+        }
+    </script>
+</body>
+</html>
