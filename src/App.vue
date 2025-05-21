@@ -1,48 +1,45 @@
 <template>
 <div>
-    <nav>
-      <a href="#">Add Person</a>
-      <a href="#">View Person</a>
-      <a href="#">Edit Person</a>
-      <a href="#">Delete Person</a>
-      <a href="#">View Statistic Person</a>
+   <nav>
+      <router-link to="/addperson">Add Person</router-link> |
+      <router-link to="/viewall">View All</router-link> |
+      <router-link to="/updateprofile/0">Edit</router-link> |
+      <router-link to="/delete/0">Delete</router-link> |
+      <router-link to="/bmitext">BMI Text</router-link>
     </nav>
-    <div>
-      <AddPerson></AddPerson>
-      <BmiText></BmiText>
-      <DeletePerson></DeletePerson>
-      <EditPerson></EditPerson>
-      <ListPersons></ListPersons>
-      <ViewPerson></ViewPerson>
-    </div>
-    <h4></h4>
+    <router-view
+      :personList="personList"
+      @person-added="handleAddPerson"
+      @person-updated="handleUpdatePerson"
+      @person-deleted="handleDeletePerson"
+    ></router-view>
   </div>
 </template>
 
 <script>
-import AddPerson from './components/AddPerson.vue'
-import BmiText from './components/BmiText.vue'
-import DeletePerson from './components/DeletePerson.vue'
-import EditPerson from './components/EditPerson.vue'
-import ListPersons from './components/ListPersons.vue'
-import ViewPerson from './components/ViewPerson.vue'
+// import AddPerson from './components/AddPerson.vue'
+// import BmiText from './components/BmiText.vue'
+// import DeletePerson from './components/DeletePerson.vue'
+// import EditPerson from './components/EditPerson.vue'
+// import ListPersons from './components/ListPersons.vue'
+// import ViewPerson from './components/ViewPerson.vue'
 
 
 export default {
   name: 'App',
   components: {
-    AddPerson,
-    BmiText,
-    DeletePerson,
-    EditPerson,
-    ListPersons,
-    ViewPerson
+    // AddPerson,
+    // BmiText,
+    // DeletePerson,
+    // EditPerson,
+    // ListPersons,
+    // ViewPerson
   },
     data() {
         return {
             personList: [
                 {
-                    name: "Hassan",
+                    name: "White Boy",
                     yob: 1995,
                     age: new Date().getFullYear() - 1995,
                     weight: 68,
@@ -52,7 +49,7 @@ export default {
                     photoUrl: "https://randomuser.me/api/portraits/men/44.jpg"
                 },
                 {
-                    name: "Siti",
+                    name: "Karen",
                     yob: 2000,
                     age: new Date().getFullYear() - 2000,
                     weight: 52,
@@ -75,5 +72,20 @@ export default {
 </script>
 
 <style>
-
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+  margin-top: 60px;
+}
+nav a {
+  margin: 0 10px;
+  text-decoration: none;
+  color: #2c3e50;
+}
+nav a.router-link-exact-active {
+  color: #42b983;
+}
 </style>
